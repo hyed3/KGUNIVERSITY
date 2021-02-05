@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kgu.www.mapper.BookMapper">
+
+<insert id="bookInsertForm">
+		INSERT INTO  book 
+     	VALUES (book_num_seq.NEXTVAL, #{book_picture}, #{book_name}, #{book_writer}, #{book_price},
+     	#{book_info}, #{book_mokcha}, #{book_inventory})
+</insert>
+
+<select id="getBookInfo" resultType = "BookVO">
+		SELECT book_num, book_picture, book_name, book_writer, book_price, book_info, book_mokcha, book_inventory 
+		FROM book
+		WHERE book_name = #{book_name}
+</select>
+
+<select id="getBookInfoN" resultType = "BookVO">
+		SELECT book_num, book_picture, book_name, book_writer, book_price, book_info, book_mokcha, book_inventory 
+		FROM book
+		WHERE book_num = #{book_num}
+</select>
+
+<update id="updateBook">
+		UPDATE book
+		SET book_picture = #{book_picture}
+			, book_name = #{book_name}
+			, book_writer = #{book_writer}
+			, book_price = #{book_price}
+			, book_info = #{book_info}
+			, book_mokcha = #{book_mokcha}
+			, book_inventory = #{book_inventory}
+		WHERE book_num = #{book_num}
+</update>
+
+<update id="updateInventory">
+		UPDATE book
+		SET book_inventory = #{book_inventory}
+		WHERE book_num = #{book_num}
+</update>
+
+<delete id ="deleteBook">
+		DELETE FROM book
+		WHERE book_name = #{book_name}
+</delete>
+
+<select id = "bookAll" resultType = "BookVO">
+		SELECT book_num, book_picture, book_name, book_writer, book_price, book_info, book_mokcha, book_inventory 
+		FROM book
+		WHERE book_num > 0
+		ORDER BY book_num DESC
+</select>
+
+<select id="supPaging" resultType = "BookVO">
+		SELECT * FROM (
+    				SELECT b.*, ROW_NUMBER() OVER(ORDER BY book_num DESC) AS RNUM
+    				FROM book b
+						)
+		WHERE RNUM BETWEEN
+		<choose>
+			<when test="pageStart == 0">
+				#{pageStart} AND #{pageStart}+#{perPageNum}
+			</when>
+			<otherwise>
+				#{pageStart}+1 AND #{pageStart}+#{perPageNum}
+			</otherwise>
+		</choose>
+</select>
+
+<select id = "countBook" resultType = "int">
+	<![CDATA[
+		SELECT COUNT(book_num)
+		FROM book
+		WHERE book_num>0
+	]]>
+</select>
+
+<select id="searchBook" resultType = "BookVO">
+		SELECT * FROM (
+    				SELECT b.*, ROW_NUMBER() OVER(ORDER BY book_num DESC) AS RNUM
+    				FROM book b
+    				WHERE book_num > 0 <include refid = "search"/>
+						)
+		WHERE RNUM BETWEEN
+		<choose>
+			<when test="pageStart == 0">
+				#{pageStart} AND #{pageStart}+#{perPageNum}
+			</when>
+			<otherwise>
+				#{pageStart}+1 AND #{pageStart}+#{perPageNum}
+			</otherwise>
+		</choose>
+</select>
+
+<select id = "countSearchedBook" resultType = "int">
+	<![CDATA[
+		SELECT COUNT(book_num)
+		FROM book
+		WHERE book_num > 0
+	]]>
+	<include refid="search"/>
+</select>
+
+<sql id ="search">
+	<if test="searchType !=null">
+		<if test = "searchType == 'book_name'.toString()">
+			AND UPPER(book_name) LIKE UPPER('%'||#{keyword}||'%')
+		</if>
+		<if test = "searchType == 'book_writer'.toString()">
+			AND UPPER(book_writer) LIKE UPPER('%'||#{keyword}||'%')
+		</if>
+	</if>
+</sql>
+
+<insert id="purchaseInsertForm">
+		INSERT INTO book_purchase  
+     	VALUES (purchase_num_seq.NEXTVAL, #{user_id}, #{book_picture}, #{book_name}, #{book_amount}, sysdate)
+</insert>
+
+<select id="purPaging" resultType = "PurchaseVO">
+		SELECT * FROM (
+    				SELECT b.*, ROW_NUMBER() OVER(ORDER BY purchase_num DESC) AS RNUM
+    				FROM book_purchase b
+						)
+		WHERE RNUM BETWEEN
+		<choose>
+			<when test="pageStart == 0">
+				#{pageStart} AND #{pageStart}+#{perPageNum}
+			</when>
+			<otherwise>
+				#{pageStart}+1 AND #{pageStart}+#{perPageNum}
+			</otherwise>
+		</choose>
+</select>
+
+<select id = "countPurchase" resultType = "int">
+	<![CDATA[
+		SELECT COUNT(purchase_num)
+		FROM book_purchase
+		WHERE purchase_num>0
+	]]>
+</select>
+
+<select id="userPurchase" resultType = "PurchaseVO">
+		SELECT * FROM (
+    				SELECT b.*, ROW_NUMBER() OVER(ORDER BY purchase_num DESC) AS RNUM
+    				FROM book_purchase b
+    				WHERE purchase_num > 0 AND user_id = #{user_id}
+						)
+		WHERE RNUM BETWEEN
+		<choose>
+			<when test="pageStart == 0">
+				#{pageStart} AND #{pageStart}+#{perPageNum}
+			</when>
+			<otherwise>
+				#{pageStart}+1 AND #{pageStart}+#{perPageNum}
+			</otherwise>
+		</choose>
+</select>
+
+<select id = "countSearchedPurchase" resultType = "int">
+	<![CDATA[
+		SELECT COUNT(purchase_num)
+		FROM book_purchase
+		WHERE purchase_num > 0 AND user_id = #{user_id}
+	]]>
+</select>
+
+<select id="bookChk" resultType="int">
+		SELECT count(*)
+		FROM book
+		WHERE book_name = #{book_name}
+</select>
+
+</mapper>

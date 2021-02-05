@@ -1,0 +1,780 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kgu.www.service.dao.BoardDAO">
+
+	<!--### 자유게시판 ### -->
+	<!-- 전체글목록 -->
+	<select id="FreeboardALL" resultType="freeBoardVO" parameterType="boardPagingVO">
+		SELECT
+			FBN_seq,
+			type,
+			title,
+			content,
+			userID,
+			userNickname,
+			regDate,
+			modifyDate,
+			hit,
+			commentCnt,
+			contentPW,
+			imgName
+		FROM Freeboard_List
+		<!-- <include refid="boardSearch" /> -->
+		<choose>
+			<when test="searchType=='title'">
+				WHERE lower(title) like '%'||#{searchKeyword}||'%'
+			</when>
+			<when test="searchType=='writer'">
+				WHERE lower(userNickname) like '%'||#{searchKeyword}||'%'
+			</when>
+			<when test="searchType=='content'">
+				WHERE lower(content) like '%'||#{searchKeyword}||'%'
+			</when>
+			<when test="searchType=='myWrite'">
+				WHERE lower(userID) like '%'||#{searchKeyword}||'%'
+			</when>
+			<otherwise>
+				WHERE title like '%%'
+			</otherwise>
+		</choose>
+		ORDER BY FBN_seq desc
+	</select>
+	
+	<!-- <sql id="boardSearch">
+		<choose>
+			<when test="searchType=='title'">
+				WHERE lower(title) like '%'||#{searchKeyword}||'%'
+			</when>
+			<when test="searchType=='writer'">
+				WHERE lower(userNickname) like '%'||#{searchKeyword}||'%'
+			</when>
+			<when test="searchType=='content'">
+				WHERE lower(content) like '%'||#{searchKeyword}||'%'
+			</when>
+			<otherwise>
+				WHERE title like '%%'
+			</otherwise>
+		</choose>
+	</sql> -->
+	
+	<!-- 글정보 -->
+	<select id="getFreeboardContent" resultType="freeBoardVO" parameterType="Integer">
+		SELECT
+			FBN_seq,
+			type,
+			title,
+			content,
+			userID,
+			userNickname,
+			regDate,
+			modifyDate,
+			hit,
+			commentCnt,
+			contentPW,
+			imgName
+		FROM Freeboard_List
+		WHERE FBN_seq=#{contentNum}
+	</select>
+	
+	<!-- 글조회수증가 -->
+	<update id="updateFreeboardHit" parameterType="Integer">
+		UPDATE Freeboard_List
+		SET hit=hit+1
+		WHERE FBN_seq=#{contentNum}
+	</update>
+	
+	<!-- 글등록 -->
+	<insert id="insertFreeboardContent" parameterType="freeBoardVO">
+		INSERT INTO Freeboard_List
+		VALUES(
+			FBN_seq.NEXTVAL,
+			#{type},
+			#{title},
+			#{content},
+			#{userID},
+			#{userNickname},
+			#{regDate},
+			#{modifyDate},
+			0,
+			0,
+			#{contentPW},
+			#{imgName}
+		)
+	</insert>
+	
+	<!-- 글수정 -->
+	<update id="updateFreeboardContent" parameterType="freeBoardVO">
+		UPDATE Freeboard_List
+		SET
+			type=#{type},
+			title=#{title},
+			content=#{content},
+			modifyDate=#{modifyDate},
+			contentPW=#{contentPW},
+			imgName=#{imgName}
+		WHERE
+			FBN_seq=#{FBN_seq}
+	</update>
+	
+	<!-- 글삭제 -->
+	<delete id="deleteFreeboardContent" parameterType="Integer">
+		DELETE FROM Freeboard_List
+		WHERE FBN_seq=#{contentNum}
+	</delete>
+	
+	<!-- 댓글목록 -->
+	<select id="getFreeboardComment" resultType="boardCommentVO" parameterType="Integer">
+		SELECT
+			contentNum,
+			FBC_seq,
+			userID,
+			userNickname,
+			boardComment,
+			regDate,
+			commentPW
+		FROM Freeboard_Comment
+		WHERE contentNum=#{contentNum}
+		ORDER BY FBC_seq asc
+	</select>
+	
+	<!-- 댓글등록 -->
+	<insert id="insertFreeboardComment" parameterType="boardCommentVO">
+		INSERT INTO Freeboard_Comment
+		VALUES(
+			#{contentNum},
+			FBC_seq.NEXTVAL,
+			#{userID},
+			#{userNickname},
+			#{boardComment},
+			#{regDate},
+			#{commentPW}
+		)
+	</insert>
+	
+	<!-- 댓글수정 -->
+	<update id="updateFreeboardComment" parameterType="boardCommentVO">
+		UPDATE Freeboard_Comment
+		SET
+			boardComment=#{boardComment},
+			commentPW=#{commentPW}
+		WHERE FBC_seq=#{commentSeq}
+	</update>
+		
+	<!-- 댓글삭제 -->
+	<delete id="deleteFreeboardOneComment" parameterType="Integer">
+		DELETE FROM Freeboard_Comment
+		WHERE FBC_seq=#{commentNum}
+	</delete>
+	
+	<!-- 특정글 댓글 전체삭제 -->
+	<delete id="deleteFreeboardComment" parameterType="Integer">
+		DELETE FROM Freeboard_Comment
+		WHERE contentNum=#{contentNum}
+	</delete>
+	
+	<!-- 댓글수증가 -->
+	<update id="plusFreeboardcommentCnt" parameterType="Integer">
+		UPDATE Freeboard_List
+		SET commentCnt=commentCnt+1
+		WHERE FBN_seq=#{contentNum}
+	</update>
+	
+	<!-- 댓글수감소 -->
+	<update id="minusFreeboardCommentCnt" parameterType="Integer">
+		UPDATE Freeboard_List
+		SET commentCnt=commentCnt-1
+		WHERE FBN_seq=#{contentNum}
+	</update>
+	
+	<!--### 자유게시판-end ### -->
+	
+	
+	<!--### 공지사항 ### -->
+	<!-- 전체글목록 -->
+	<select id="noticeAll" resultType="noticeVO" parameterType="boardPagingVO">
+		SELECT
+			NTN_seq,
+			type,
+			title,
+			content,
+			userID,
+			userNickname,
+			regDate,
+			modifyDate,
+			hit,
+			commentCnt,
+			contentPW,
+			imgName
+		FROM Notice_List
+		<choose>
+			<when test="searchType=='title'">
+				WHERE lower(title) like '%'||#{searchKeyword}||'%'
+			</when>
+			<when test="searchType=='writer'">
+				WHERE lower(userNickname) like '%'||#{searchKeyword}||'%'
+			</when>
+			<when test="searchType=='content'">
+				WHERE lower(content) like '%'||#{searchKeyword}||'%'
+			</when>
+			<when test="searchType=='myWrite'">
+				WHERE lower(userID) like '%'||#{searchKeyword}||'%'
+			</when>
+			<otherwise>
+				WHERE title like '%%'
+			</otherwise>
+		</choose>
+		ORDER BY NTN_seq desc
+	</select>
+	
+	<!-- 글정보 -->
+	<select id="getNoticeContent" resultType="noticeVO" parameterType="Integer">
+		SELECT
+			NTN_seq,
+			type,
+			title,
+			content,
+			userID,
+			userNickname,
+			regDate,
+			modifyDate,
+			hit,
+			commentCnt,
+			contentPW,
+			imgName
+		FROM Notice_List
+		WHERE NTN_seq=#{contentNum}
+	</select>
+	
+	<!-- 글조회수증가 -->
+	<update id="updateNoticeHit" parameterType="Integer">
+		UPDATE Notice_List
+		SET hit=hit+1
+		WHERE NTN_seq=#{contentNum}
+	</update>
+	
+	<!-- 글등록 -->
+	<insert id="insertNoticeContent" parameterType="noticeVO">
+		INSERT INTO Notice_List
+		VALUES(
+			NTN_seq.NEXTVAL,
+			#{type},
+			#{title},
+			#{content},
+			#{userID},
+			#{userNickname},
+			#{regDate},
+			#{modifyDate},
+			0,
+			0,
+			#{contentPW},
+			#{imgName}
+		)
+	</insert>
+	
+	<!-- 글수정 -->
+	<update id="updateNoticeContent" parameterType="noticeVO">
+		UPDATE Notice_List
+		SET
+			type=#{type},
+			title=#{title},
+			content=#{content},
+			modifyDate=#{modifyDate},
+			contentPW=#{contentPW},
+			imgName=#{imgName}
+		WHERE
+			NTN_seq=#{NTN_seq}
+	</update>
+	
+	<!-- 글삭제 -->
+	<delete id="deleteNoticeContent" parameterType="Integer">
+		DELETE FROM Notice_List
+		WHERE NTN_seq=#{contentNum}
+	</delete>
+	
+	<!-- 댓글목록 -->
+	<select id="getNoticeComment" resultType="boardCommentVO" parameterType="Integer">
+		SELECT
+			contentNum,
+			NTC_seq,
+			userID,
+			userNickname,
+			boardComment,
+			regDate,
+			commentPW
+		FROM Notice_Comment
+		WHERE contentNum=#{contentNum}
+		ORDER BY NTC_seq asc
+	</select>
+	
+	<!-- 댓글등록 -->
+	<insert id="insertNoticeComment" parameterType="boardCommentVO">
+		INSERT INTO Notice_Comment
+		VALUES(
+			#{contentNum},
+			NTC_seq.NEXTVAL,
+			#{userID},
+			#{userNickname},
+			#{boardComment},
+			#{regDate},
+			#{commentPW}
+		)
+	</insert>
+	
+	<!-- 댓글수정 -->
+	<update id="updateNoticeComment" parameterType="boardCommentVO">
+		UPDATE Notice_Comment
+		SET
+			boardComment=#{boardComment},
+			commentPW=#{commentPW}
+		WHERE NTC_seq=#{commentSeq}
+	</update>
+	
+	<!-- 댓글삭제 -->
+	<delete id="deleteNoticeOneComment" parameterType="Integer">
+		DELETE FROM Notice_Comment
+		WHERE NTC_seq=#{commentNum}
+	</delete>
+	
+	<!-- 특정글 댓글 전체삭제 -->
+	<delete id="deleteNoticeComment" parameterType="Integer">
+		DELETE FROM Notice_Comment
+		WHERE contentNum=#{contentNum}
+	</delete>
+	
+	<!-- 댓글수증가 -->
+	<update id="plusNoticeCommentCnt" parameterType="Integer">
+		UPDATE Notice_List
+		SET commentCnt=commentCnt+1
+		WHERE NTN_seq=#{contentNum}
+	</update>
+	
+	<!-- 댓글수감소 -->
+	<update id="minusNoticeCommentCnt" parameterType="Integer">
+		UPDATE Notice_List
+		SET commentCnt=commentCnt-1
+		WHERE NTN_seq=#{contentNum}
+	</update>
+	
+	<!--### 공지시항-end ### -->
+	
+	
+	<!--### 정보게시판 ### -->
+	<!-- 전체글목록 -->
+	<select id="infoBoardAll" resultType="infoBoardVO" parameterType="boardPagingVO">
+		SELECT
+			IBN_seq,
+			type,
+			title,
+			content,
+			userID,
+			userNickname,
+			regDate,
+			modifyDate,
+			hit,
+			commentCnt,
+			contentPW,
+			imgName
+		FROM Infoboard_List
+		<choose>
+			<when test="searchType=='title'">
+				WHERE lower(title) like '%'||#{searchKeyword}||'%'
+			</when>
+			<when test="searchType=='writer'">
+				WHERE lower(userNickname) like '%'||#{searchKeyword}||'%'
+			</when>
+			<when test="searchType=='content'">
+				WHERE lower(content) like '%'||#{searchKeyword}||'%'
+			</when>
+			<when test="searchType=='myWrite'">
+				WHERE lower(userID) like '%'||#{searchKeyword}||'%'
+			</when>
+			<otherwise>
+				WHERE title like '%%'
+			</otherwise>
+		</choose>
+		ORDER BY IBN_seq desc
+	</select>
+	
+	<!-- 글정보 -->
+	<select id="getInfoboardContent" resultType="infoBoardVO" parameterType="Integer">
+		SELECT
+			IBN_seq,
+			type,
+			title,
+			content,
+			userID,
+			userNickname,
+			regDate,
+			modifyDate,
+			hit,
+			commentCnt,
+			contentPW,
+			imgName
+		FROM Infoboard_List
+		WHERE IBN_seq=#{contentNum}
+	</select>
+	
+	<!-- 글조회수증가 -->
+	<update id="updateInfoboardHit" parameterType="Integer">
+		UPDATE Infoboard_List
+		SET hit=hit+1
+		WHERE IBN_seq=#{contentNum}
+	</update>
+	
+	<!-- 글등록 -->
+	<insert id="insertInfoboardContent" parameterType="infoBoardVO">
+		INSERT INTO Infoboard_List
+		VALUES(
+			IBN_seq.NEXTVAL,
+			#{type},
+			#{title},
+			#{content},
+			#{userID},
+			#{userNickname},
+			#{regDate},
+			#{modifyDate},
+			0,
+			0,
+			#{contentPW},
+			#{imgName}
+		)
+	</insert>
+	
+	<!-- 글수정 -->
+	<update id="updateInfoboardContent" parameterType="infoBoardVO">
+		UPDATE Infoboard_List
+		SET
+			type=#{type},
+			title=#{title},
+			content=#{content},
+			modifyDate=#{modifyDate},
+			contentPW=#{contentPW},
+			imgName=#{imgName}
+		WHERE
+			IBN_seq=#{IBN_seq}
+	</update>
+	
+	<!-- 글삭제 -->
+	<delete id="deleteInfoboardContent" parameterType="Integer">
+		DELETE FROM Infoboard_List
+		WHERE IBN_seq=#{contentNum}
+	</delete>
+	
+	<!-- 댓글목록 -->
+	<select id="getInfoboardComment" resultType="boardCommentVO" parameterType="Integer">
+		SELECT
+			contentNum,
+			IBC_seq,
+			userID,
+			userNickname,
+			boardComment,
+			regDate,
+			commentPW
+		FROM Infoboard_Comment
+		WHERE contentNum=#{contentNum}
+		ORDER BY IBC_seq asc
+	</select>
+	
+	<!-- 댓글등록 -->
+	<insert id="insertInfoboardComment" parameterType="boardCommentVO">
+		INSERT INTO Infoboard_Comment
+		VALUES(
+			#{contentNum},
+			IBC_seq.NEXTVAL,
+			#{userID},
+			#{userNickname},
+			#{boardComment},
+			#{regDate},
+			#{commentPW}
+		)
+	</insert>
+	
+	<!-- 댓글수정 -->
+	<update id="updateinfoboardComment" parameterType="boardCommentVO">
+		UPDATE Infoboard_Comment
+		SET
+			boardComment=#{boardComment},
+			commentPW=#{commentPW}
+		WHERE IBC_seq=#{commentSeq}
+	</update>
+	
+	<!-- 댓글삭제 -->
+	<delete id="deleteInfoboardOneComment" parameterType="Integer">
+		DELETE FROM Infoboard_Comment
+		WHERE IBC_seq=#{commentNum}
+	</delete>
+	
+	<!-- 특정글 댓글 전체삭제 -->
+	<delete id="deleteInfoboardComment" parameterType="Integer">
+		DELETE FROM Infoboard_Comment
+		WHERE contentNum=#{contentNum}
+	</delete>
+	
+	<!-- 댓글수증가 -->
+	<update id="plusInfoboardcommentCnt" parameterType="Integer">
+		UPDATE Infoboard_List
+		SET commentCnt=commentCnt+1
+		WHERE IBN_seq=#{contentNum}
+	</update>
+	
+	<!-- 댓글수감소 -->
+	<update id="minusInfoboardCommentCnt" parameterType="Integer">
+		UPDATE Infoboard_List
+		SET commentCnt=commentCnt-1
+		WHERE IBN_seq=#{contentNum}
+	</update>
+	
+	<!--### 정보게시판-end ### -->
+	
+	
+	<!--### 동아리게시판 ### -->
+	
+	<!-- 전체글목록 -->
+	<select id="clubboardAll" resultType="clubBoardVO" parameterType="boardPagingVO">
+		SELECT
+			CBN_seq,
+			type,
+			title,
+			content,
+			userID,
+			userNickname,
+			regDate,
+			modifyDate,
+			hit,
+			commentCnt,
+			contentPW,
+			imgName
+		FROM Clubboard_List
+		<choose>
+			<when test="searchType=='title'">
+				WHERE lower(title) like '%'||#{searchKeyword}||'%'
+			</when>
+			<when test="searchType=='writer'">
+				WHERE lower(userNickname) like '%'||#{searchKeyword}||'%'
+			</when>
+			<when test="searchType=='content'">
+				WHERE lower(content) like '%'||#{searchKeyword}||'%'
+			</when>
+			<when test="searchType=='myWrite'">
+				WHERE lower(userID) like '%'||#{searchKeyword}||'%'
+			</when>
+			<otherwise>
+				WHERE title like '%%'
+			</otherwise>
+		</choose>
+		ORDER BY CBN_seq desc
+	</select>
+	
+	<!-- 글정보 -->
+	<select id="getClubboardContent" resultType="clubBoardVO" parameterType="Integer">
+		SELECT
+			CBN_seq,
+			type,
+			title,
+			content,
+			userID,
+			userNickname,
+			regDate,
+			modifyDate,
+			hit,
+			commentCnt,
+			contentPW,
+			imgName
+		FROM Clubboard_List
+		WHERE CBN_seq=#{contentNum}
+	</select>
+	
+	<!-- 글조회수증가 -->
+	<update id="updateClubboardHit" parameterType="Integer">
+		UPDATE Clubboard_List
+		SET hit=hit+1
+		WHERE CBN_seq=#{contentNum}
+	</update>
+	
+	<!-- 글등록 -->
+	<insert id="insertClubboardContent" parameterType="clubBoardVO">
+		INSERT INTO Clubboard_List
+		VALUES(
+			CBN_seq.NEXTVAL,
+			#{type},
+			#{title},
+			#{content},
+			#{userID},
+			#{userNickname},
+			#{regDate},
+			#{modifyDate},
+			0,
+			0,
+			#{contentPW},
+			#{imgName}
+		)
+	</insert>
+	
+	<!-- 글수정 -->
+	<update id="updateClubboardContent" parameterType="clubBoardVO">
+		UPDATE Clubboard_List
+		SET
+			type=#{type},
+			title=#{title},
+			content=#{content},
+			modifyDate=#{modifyDate},
+			contentPW=#{contentPW},
+			imgName=#{imgName}
+		WHERE
+			CBN_seq=#{CBN_seq}
+	</update>
+	
+	<!-- 글삭제 -->
+	<delete id="deleteClubboardContent" parameterType="Integer">
+		DELETE FROM Clubboard_List
+		WHERE CBN_seq=#{contentNum}
+	</delete>
+	
+	<!-- 댓글목록 -->
+	<select id="getClubboardComment" resultType="boardCommentVO" parameterType="Integer">
+		SELECT
+			contentNum,
+			CBC_seq,
+			userID,
+			userNickname,
+			boardComment,
+			regDate,
+			commentPW
+		FROM Clubboard_Comment
+		WHERE contentNum=#{contentNum}
+		ORDER BY CBC_seq asc
+	</select>
+	
+	<!-- 댓글등록 -->
+	<insert id="insertClubboardComment" parameterType="boardCommentVO">
+		INSERT INTO Clubboard_Comment
+		VALUES(
+			#{contentNum},
+			CBC_seq.NEXTVAL,
+			#{userID},
+			#{userNickname},
+			#{boardComment},
+			#{regDate},
+			#{commentPW}
+		)
+	</insert>
+	
+	<!-- 댓글수정 -->
+	<update id="updateClubboardComment" parameterType="boardCommentVO">
+		UPDATE Clubboard_Comment
+		SET
+			boardComment=#{boardComment},
+			commentPW=#{commentPW}
+		WHERE CBC_seq=#{commentSeq}
+	</update>
+	
+	<!-- 댓글삭제 -->
+	<delete id="deleteClubboardOneComment" parameterType="Integer">
+		DELETE FROM Clubboard_Comment
+		WHERE CBC_seq=#{commentNum}
+	</delete>
+	
+	<!-- 특정글 댓글 전체삭제 -->
+	<delete id="deleteClubboardComment" parameterType="Integer">
+		DELETE FROM Clubboard_Comment
+		WHERE contentNum=#{contentNum}
+	</delete>
+	
+	<!-- 댓글수증가 -->
+	<update id="plusClubboardcommentCnt" parameterType="Integer">
+		UPDATE Clubboard_List
+		SET commentCnt=commentCnt+1
+		WHERE CBN_seq=#{contentNum}
+	</update>
+	
+	<!-- 댓글수감소 -->
+	<update id="minusClubboardCommentCnt" parameterType="Integer">
+		UPDATE Clubboard_List
+		SET commentCnt=commentCnt-1
+		WHERE CBN_seq=#{contentNum}
+	</update>
+	
+	<!--### 동아리게시판-end ### -->
+	
+	<!--### 홈페이지 ###  -->
+	<!-- 자유게시판 홈페이지  -->
+	<select id = "freeHome" resultType = "freeBoardVO" >
+		SELECT
+			FBN_seq,
+			type,
+			title,
+			content,
+			userID,
+			userNickname,
+			regDate,
+			modifyDate,
+			hit,
+			commentCnt,
+			contentPW,
+			imgName
+		FROM Freeboard_List
+		ORDER BY FBN_seq DESC
+	</select>
+	
+	<!-- 공지사항 홈페이지  -->
+	<select id="noticeHome" resultType="noticeVO">
+		SELECT
+			NTN_seq,
+			type,
+			title,
+			content,
+			userID,
+			userNickname,
+			regDate,
+			modifyDate,
+			hit,
+			commentCnt,
+			contentPW,
+			imgName
+		FROM Notice_List
+		ORDER BY NTN_seq DESC
+	</select>
+	
+	<!-- 정보게시판 홈페이지  -->
+	<select id="infoHome" resultType="infoBoardVO">
+		SELECT
+			IBN_seq,
+			type,
+			title,
+			content,
+			userID,
+			userNickname,
+			regDate,
+			modifyDate,
+			hit,
+			commentCnt,
+			contentPW,
+			imgName
+		FROM Infoboard_List
+		ORDER BY IBN_seq DESC
+	</select>
+	
+	<select id="clubHome" resultType="clubBoardVO">
+		SELECT
+			CBN_seq,
+			type,
+			title,
+			content,
+			userID,
+			userNickname,
+			regDate,
+			modifyDate,
+			hit,
+			commentCnt,
+			contentPW,
+			imgName
+		FROM Clubboard_List
+		ORDER BY CBN_seq DESC
+	</select>
+	<!--### 홈페이지-end ###-->
+	
+</mapper>
+
+
+

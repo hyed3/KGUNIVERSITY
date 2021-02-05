@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kgu.www.service.dao.SangpumDAO">
+	
+	<!-- 리스트 출력 -->
+	<select id="SangpumAll" resultType="com.kgu.www.vo.SangpumVO">
+		SELECT bno, id, wrdate, viewcnt, title, content, sb
+		FROM SANGPUM
+		ORDER BY BNO DESC
+	</select>
+	
+	<!-- 게시물 작성 
+		 데이터를 넣을때는 parameterType을 사용 -->
+
+	<insert id="SangpumInsert" parameterType="com.kgu.www.vo.SangpumVO">
+		insert into
+			SANGPUM(title,content,id,sb,bno,IMGNAME)
+			values(#{title},#{content},#{id},#{sb},SANGPUM_SEQ.NEXTVAL,#{IMGNAME} )
+	</insert>
+	
+	<!-- 상품상세보기 -->
+	<select id="SangpumDetail" resultType="com.kgu.www.vo.SangpumVO" parameterType="int">
+	SELECT * FROM SANGPUM WHERE BNO = #{bno }
+	</select>
+	
+	<!-- 조회수 올리기 -->
+	<update id="plusCnt" parameterType="int">
+	UPDATE SANGPUM SET VIEWCNT = VIEWCNT + 1 WHERE BNO = #{bno }
+	</update>
+	
+	<!-- 게시글 삭제 -->
+	<delete id="SangpumDel" parameterType="int">
+	DELETE FROM SANGPUM WHERE BNO = #{bno}
+	</delete>
+	
+	<!-- 게시글 개수 체크  -->
+	<select id="count" resultType="int">
+	SELECT count(*) FROM SANGPUM 
+	<include refid="search"></include>
+	</select>
+	
+	<!-- 페이징 처리후 게시글 조회 -->
+	<select id="selectBoard"  resultType="com.kgu.www.vo.SangpumVO"
+	parameterType="com.kgu.www.vo.PagingVO">
+	SELECT *
+		FROM(
+				SELECT ROWNUM RN, A.*
+				FROM(
+				SELECT *
+				FROM SANGPUM
+				<include refid="search"></include>
+				ORDER BY bno DESC) A
+				)
+				
+		WHERE RN BETWEEN #{start} AND #{end}
+	</select>
+	
+	<!-- 검색어 기능  -->
+	<sql id="search">
+		<!-- 검색어가 존재하는 경우에만 검색을 실행한다 -->
+	<if test="Keyword != null and Keyword != ''.toString()">
+			where 1=1 <!-- 형식을 맞추기 위한 False -->
+			<if test="searchType == 't'.toString()">
+			AND TITLE LIKE '%' || #{Keyword} || '%'</if>
+			<if test="searchType == 'c'.toString()">
+			AND CONTENT LIKE '%' || #{Keyword} || '%'</if>
+			<if test="searchType == 'i'.toString()">
+			AND ID LIKE '%' || #{Keyword} || '%'</if>			
+		</if>
+	</sql>
+	
+	
+	<!-- 댓글 등록 -->
+	<insert id="insertComm" parameterType="com.kgu.www.vo.CommVO">
+	insert into COMM (bno,cid,cno,ctext)
+	values(#{bno},#{cid},commseq.nextval,#{ctext})
+	</insert>
+	
+	<!-- 댓글 리스트 출력 -->
+	<select id="CommAll" resultType="com.kgu.www.vo.CommVO">
+		SELECT *
+		FROM COMM
+		WHERE BNO = #{bno }
+		ORDER BY BNO DESC
+	</select>
+	
+	<!-- 특정 댓글 삭제 -->
+	<delete id="deleteComm" parameterType="int">
+	delete from COMM where cno= #{cno}
+	</delete>
+
+<!-- 해당글의 모든 댓글 삭제(글삭제용) -->
+	<delete id="deleteAllComm">
+	delete from COMM where bno=#{bno}
+	</delete>
+	
+	
+
+</mapper>

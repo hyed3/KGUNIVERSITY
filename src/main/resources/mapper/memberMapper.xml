@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="member">
+	<!-- 로그인체크 -->
+	<select id="loginChk" resultType="String">
+		SELECT userName
+		FROM member
+		WHERE userId = #{userId} AND userPw = #{userPw}
+	</select>
+	
+	<!-- 인증여부체크 -->
+	<select id="verifyChk" resultType="int">
+		SELECT verification
+		FROM member
+		WHERE userId = #{userId}
+	</select>
+	
+	<!-- 로그인한 회원정보 가져오기 -->
+	<select id="viewMember" resultType="memberVO">
+		SELECT *
+		FROM member
+		WHERE userId = #{userId}
+	</select>
+	
+	<!-- 회원가입 -->
+	<insert id="insertMember">
+		INSERT INTO member (userId, userPw, userName, email, nickname)
+		VALUES (#{userId}, #{userPw}, #{userName}, #{email}, #{nickname})
+	</insert>
+	
+	<!-- 아이디 중복체크 -->
+	<select id="idChk" resultType="int">
+		SELECT count(*)
+		FROM member
+		WHERE userId = #{userId}
+	</select>
+	
+	<!-- 이메일 중복체크 -->
+	<select id="emailChk" resultType="int">
+		SELECT count(*)
+		FROM member
+		WHERE email = #{email}
+	</select>
+	
+	<!-- 닉네임 중복체크 -->
+	<select id="nickChk" resultType="int">
+		SELECT count(*)
+		FROM member
+		WHERE nickname = #{nickname}
+	</select>
+	
+	<!-- 비밀번호 확인 -->
+	<select id="pwChk" resultType="String">
+		SELECT userPw
+		FROM member
+		WHERE userId = #{userId}
+	</select>
+	
+	<!-- 회원정보 수정 -->
+	<update id="updateMember">
+		UPDATE member
+		SET	userName = #{userName},
+			nickname = #{nickname},
+			email = #{email}
+		WHERE
+			userId = #{userId}
+	</update>
+	
+	<!-- 비밀번호변경 -->
+	<update id="updatePw">
+		UPDATE member
+		SET userPw = #{userPw}
+		WHERE userId = #{userId}
+	</update>
+	
+	<!-- 회원삭제 -->
+	<delete id="deleteMember">
+		DELETE FROM member
+		WHERE userId = #{userId}
+	</delete>
+	
+	<!-- 회원이메일인증 -->
+	<update id="verification">
+		UPDATE member
+		SET verification = 1
+		WHERE userId = #{userId}
+	</update>
+	
+	<!-- 아이디찾기 -->
+	<select id="findId" resultType="String">
+		SELECT userId
+		FROM member
+		WHERE email = #{email}
+	</select>
+	
+</mapper>
