@@ -14,7 +14,7 @@
 		<org.aspectj-version>1.6.10</org.aspectj-version>
 		<org.slf4j-version>1.6.6</org.slf4j-version>
 	</properties>
-	<!--2021.01.22 윤상민 결제api  -->
+	
 	<repositories>
 		<repository>
 	   		<id>jitpack.io</id>
@@ -27,7 +27,7 @@
 	    	<artifactId>iamport-rest-client-java</artifactId>
 	    	<version>0.2.13</version>
 		</dependency>
-	<!-- 2021.01.22 윤상민 결제api  -->
+
 		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>

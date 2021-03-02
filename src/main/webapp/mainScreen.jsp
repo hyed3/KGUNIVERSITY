@@ -13,6 +13,7 @@
 		/* location.href="FreeBoard_List.do" */
 		/* location.href="cssTest.do" */
 	</script>
+	
 	<!-- <script>
 		location.href="FreeBoard_List.do"
 	</script> -->

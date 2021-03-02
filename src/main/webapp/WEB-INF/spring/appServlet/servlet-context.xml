@@ -48,14 +48,14 @@
 		<!-- <beans:constructor-arg value="C:\Users\shonl\OneDrive\바탕 화면\KG_University\src\main\webapp\resources" 
 			/> -->
 		<beans:constructor-arg
-			value="C:\Users\pc\Desktop\KGUniversity\src\main\webapp\resources" />
+			value="C:\Users\shonl\git\KGUNIVERSITY\src\main\webapp\resources" />
 <!-- 			value="C:\Users\skyra\Desktop\K\스터디\ITBANK\자바 웹개발\[[프로젝트4 - KG University]]\Project4_workspace\KG_University\src\main\webapp\resources" /> -->
 	</beans:bean>
 	<!-- 일반 파일 업로드 경로 -->
 	<!-- <resources mapping="/imgUpload/**" location="file:///C:/Users/shonl/OneDrive/바탕 
 		화면/KG_University/src/main/webapp/resources/imgUpload/" /> -->
 	<resources mapping="/imgUpload/**"
-		location="file:///C:\Users\pc\Desktop\KGUniversity\src\main\webapp\resources\imgUpload/" />
+		location="file:///C:\Users\shonl\git\KGUNIVERSITY\src\main\webapp\resources\imgUpload/" />
 		<!-- location="file:///C:\Users\skyra\Desktop\K\스터디\ITBANK\자바 웹개발\[[프로젝트4 - KG University]]\Project4_workspace\KG_University\src\main\webapp\resources\imgUpload/" /> -->
 	<!-- 2021.01.20 손혜지-end -->
 
