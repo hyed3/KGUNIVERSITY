@@ -12,9 +12,27 @@ public class SangpumVO {
 	private int viewcnt;
 	private Date wrdate;
 	private String IMGNAME;
+	private String x;
+	private String y;
+	
+	public String toString(){
+		return x+" "+y;
+	}
 	
 	public String getIMGNAME() {
 		return IMGNAME;
+	}
+	public String getX() {
+		return x;
+	}
+	public void setX(String x) {
+		this.x = x;
+	}
+	public String getY() {
+		return y;
+	}
+	public void setY(String y) {
+		this.y = y;
 	}
 	public void setIMGNAME(String iMGNAME) {
 		IMGNAME = iMGNAME;

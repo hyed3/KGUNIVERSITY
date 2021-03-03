@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/litera/bootstrap.min.css" integrity="sha384-enpDwFISL6M3ZGZ50Tjo8m65q06uLVnyvkFO3rsoW0UC15ATBFz3QEhr3hmxpYsn" crossorigin="anonymous">
 <meta charset="UTF-8">
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=651a3d558f53f93f220843e3443db1cf"></script>
 
 <script>
 
@@ -65,15 +66,28 @@
 		<tr><!-- 카카오맵 들어갈 곳 -->
 		<td>
 		<div id="map" style ="width:500px;height:400px;">
-		<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=651a3d558f53f93f220843e3443db1cf"></script>
+		
 	<script>
+		var x = ${Detail.x};
+		var y = ${Detail.y};
 		var container = document.getElementById('map');
 		var options = {
-			center: new kakao.maps.LatLng(33.450701, 126.570667),
+			center: new kakao.maps.LatLng(x, y),
 			level: 3
 		};
 
 		var map = new kakao.maps.Map(container, options);
+		
+		// 마커가 표시될 위치입니다 
+		var markerPosition  = new kakao.maps.LatLng(x, y); 
+		
+		// 마커를 생성합니다
+		var marker = new kakao.maps.Marker({
+		    position: markerPosition
+		});
+
+		// 마커가 지도 위에 표시되도록 설정합니다
+		marker.setMap(map);
 	</script>
  		</div>
  		</td>

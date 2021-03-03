@@ -8,6 +8,22 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/litera/bootstrap.min.css" integrity="sha384-enpDwFISL6M3ZGZ50Tjo8m65q06uLVnyvkFO3rsoW0UC15ATBFz3QEhr3hmxpYsn" crossorigin="anonymous">
 <meta charset="UTF-8">
 <title>게시물 작성</title>
+<script>
+if(navigator.geolocation){
+	  
+	  //GeoLocation을 이용해서 접속위치를 얻어온다
+	  navigator.geolocation.getCurrentPosition(function(position){
+		  
+		  var lat = position.coords.latitude, //위도
+		  	  lon = position.coords.longitude; //경도
+		  	  
+		  	document.getElementById('x').value= lat;
+		  	document.getElementById('y').value= lon;
+	  });
+}else{
+	  console.log('GPS를 사용할 수 없습니다.');
+}
+</script>
 </head>
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <style>
@@ -47,6 +63,8 @@
         <label for="gdsImg">이미지</label>
         <input type="file" id="gdsImg" name="file"/>
         <div class="select_img"><img src=""/>
+        <input type="hidden" id="x" name="x" value="100">
+        <input type="hidden" id="y" name ="y" value="200">
               <script>
   $("#gdsImg").change(function(){
    if(this.files && this.files[0]) {
@@ -57,6 +75,7 @@
     reader.readAsDataURL(this.files[0]);
    }
   });
+  
  </script>
         </div>
         

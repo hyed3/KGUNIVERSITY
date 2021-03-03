@@ -15,8 +15,8 @@
 
 	<insert id="SangpumInsert" parameterType="com.kgu.www.vo.SangpumVO">
 		insert into
-			SANGPUM(title,content,id,sb,bno,IMGNAME)
-			values(#{title},#{content},#{id},#{sb},SANGPUM_SEQ.NEXTVAL,#{IMGNAME} )
+			SANGPUM(title,content,id,sb,bno,IMGNAME,x,y)
+			values(#{title},#{content},#{id},#{sb},SANGPUM_SEQ.NEXTVAL,#{IMGNAME},#{x},#{y} )
 	</insert>
 	
 	<!-- 상품상세보기 -->

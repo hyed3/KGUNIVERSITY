@@ -63,7 +63,8 @@ public class SangpumController {
 			}
 
 			vo.setIMGNAME(File.separator +"www"+File.separator+ "imgUpload" + ymdPath + File.separator + "s" + File.separator + "s_" + fileName);
-
+			
+			System.out.println(vo);
 		sangpumService.SangpumInsert(vo);
 		
 		return "redirect:boardList";
